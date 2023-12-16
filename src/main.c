@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "interface.h"
+#include "interfaces/interface.h"
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID reserved)
 {

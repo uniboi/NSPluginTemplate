@@ -7,35 +7,39 @@
 #define PLUGIN_DEPENDENCY_NAME PLUGIN_NAME
 #define PLUGIN_CONTEXT (PCTX_DEDICATED | PCTX_CLIENT)
 
-PluginProperty GetProperty(IPluginId* self, PluginPropertyId prop)
+const char* GetString(IPluginId* self, PluginString prop)
 {
-  PluginProperty value;
-
   switch(prop)
   {
     case ID_NAME:
-      value.string = PLUGIN_NAME;
+      return PLUGIN_NAME;
       break;
     case ID_LOG_NAME:
-      value.string = PLUGIN_LOG_NAME;
+      return PLUGIN_LOG_NAME;
       break;
     case ID_DEPENDENCY_NAME:
-      value.string = PLUGIN_DEPENDENCY_NAME;
-      break;
-    case ID_CONTEXT:
-      value.number = PCTX_DEDICATED;
+      return PLUGIN_DEPENDENCY_NAME;
       break;
     default:
-      value.number = 0;
+      return 0;
   }
+}
 
-  return value;
+int64_t GetField(IPluginId* self, PluginField prop)
+{
+  switch(prop)
+  {
+    case ID_CONTEXT:
+      return PLUGIN_CONTEXT;
+    default:
+      return 0;
+    }
 }
 
 void Init(IPluginCallbacks* self, NorthstarData* data)
 {
   init_ns_interface(data);
-  logger_init();
+  sys_init();
   ns_log(LOG_INFO, "Successfully initialized");
 }
 
@@ -53,10 +57,25 @@ void Finalize(IPluginCallbacks* self)
    */
 }
 
+void Unload(IPluginCallbacks* self) {};
+
+void OnSqvmCreated(IPluginCallbacks* self, void* c_sqvm) {}
+
+void OnSqvmDestroyed(IPluginCallbacks* self, int context) {}
+
+void OnLibraryLoaded(IPluginCallbacks* self, HMODULE module, wchar_t* name) {}
+
+void RunFrame(IPluginCallbacks* self) {}
+
 IPluginCallbacks g_pluginCallbacks = {
   .vftable = &(struct IPluginCallbacks_vftable){
     .Init = Init,
-    .Finalize = Finalize
+    .Finalize = Finalize,
+    .Unload = Unload,
+    .OnSqvmCreated = OnSqvmCreated,
+    .OnSqvmDestroyed = OnSqvmDestroyed,
+    .OnLibraryLoaded = OnLibraryLoaded,
+    .RunFrame = RunFrame
   }
 };
 
@@ -64,7 +83,8 @@ void* CreatePluginCallbacks() { return &g_pluginCallbacks; }
 
 IPluginId g_pluginId = {
   .vftable = &(struct IPluginId_vftable){
-    .GetProperty = GetProperty
+    .GetString = GetString,
+    .GetField = GetField
   }
 };
 

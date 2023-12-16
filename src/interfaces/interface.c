@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "interface.h"
-#include "plugin_callbacks.h"
+#include "interfaces/plugin_callbacks.h"
 
 #define CALLBACK_INTERFACE_VERSION "PluginCallbacks001"
 

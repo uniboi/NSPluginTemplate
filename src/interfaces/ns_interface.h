@@ -1,8 +1,7 @@
 #ifndef NS_INTERFACE_H
 #define NS_INTERFACE_H
 
-// TODO fix paths
-#include "../interface.h"
+#include "interfaces/interface.h"
 #include <windows.h>
 
 typedef struct {
