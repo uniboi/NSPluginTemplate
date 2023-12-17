@@ -12,6 +12,11 @@ add_library(p4_test SHARED
   src/interfaces/ns_interface.c
   src/interfaces/sys.h
   src/interfaces/sys.c
+  src/squirrel/squirrel.h
+  src/squirrel/squirrel.c
+  src/squirrel/relay.h
+  src/squirrel/relay.c
+  src/squirrel/sqvm.h
 )
 
 target_include_directories(p4_test PRIVATE

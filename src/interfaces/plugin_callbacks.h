@@ -6,6 +6,7 @@
 #include "interfaces/sys.h"
 #include "interface.h"
 #include "interfaces/ns_interface.h"
+#include "squirrel/squirrel.h"
 
 #define PLUGIN_ID_VERSION "PluginId001"
 
@@ -42,12 +43,12 @@ void* CreatePluginId();
 // interface that defines all launcher callbacks
 typedef struct IPluginCallbacks {
   struct IPluginCallbacks_vftable{
-   void (*Init)(struct IPluginCallbacks* self, NorthstarData* data);
+   void (*Init)(struct IPluginCallbacks* self, HMODULE module, NorthstarData* data, char reloaded);
    void (*Finalize)(struct IPluginCallbacks* self);
    void (*Unload)(struct IPluginCallbacks* self);
-   void (*OnSqvmCreated)(struct IPluginCallbacks* self, void* c_sqvm);
-   void (*OnSqvmDestroyed)(struct IPluginCallbacks* self, int context);
-   void (*OnLibraryLoaded)(struct IPluginCallbacks* self, HMODULE module, wchar_t* name);
+   void (*OnSqvmCreated)(struct IPluginCallbacks* self, CSquirrelVM* c_sqvm);
+   void (*OnSqvmDestroyed)(struct IPluginCallbacks* self, CSquirrelVM* c_sqvm);
+   void (*OnLibraryLoaded)(struct IPluginCallbacks* self, HMODULE module, const char* name);
    void (*RunFrame)(struct IPluginCallbacks* self);
   }* vftable;
 } IPluginCallbacks;

@@ -1,11 +1,26 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "plugin_callbacks.h"
+#include "squirrel/relay.h"
 
 #define PLUGIN_NAME "P4Plugin"
 #define PLUGIN_LOG_NAME PLUGIN_NAME
 #define PLUGIN_DEPENDENCY_NAME PLUGIN_NAME
 #define PLUGIN_CONTEXT (PCTX_DEDICATED | PCTX_CLIENT)
+
+void reinitialize()
+{
+  ns_log(LOG_INFO, "reinitializing");
+
+  HMODULE sv_module = GetModuleHandleA("server.dll");
+  if(sv_module)
+    init_relay_sv(sv_module);
+
+  HMODULE cl_module = GetModuleHandleA("client.dll");
+  if(cl_module)
+    init_relay_cl(cl_module);
+}
 
 const char* GetString(IPluginId* self, PluginString prop)
 {
@@ -36,10 +51,14 @@ int64_t GetField(IPluginId* self, PluginField prop)
     }
 }
 
-void Init(IPluginCallbacks* self, NorthstarData* data)
+void Init(IPluginCallbacks* self, HMODULE module, NorthstarData* data, char reloaded)
 {
-  init_ns_interface(data);
+  init_ns_interface(module, data);
   sys_init();
+
+  if(reloaded)
+    reinitialize();
+
   ns_log(LOG_INFO, "Successfully initialized");
 }
 
@@ -55,15 +74,41 @@ void Finalize(IPluginCallbacks* self)
    * 	...
    * }
    */
+
+  ns_log(LOG_INFO, "Finalized.");
 }
 
-void Unload(IPluginCallbacks* self) {};
+void Unload(IPluginCallbacks* self)
+{
+  ns_log(LOG_INFO, "Unloading.");
+}
 
-void OnSqvmCreated(IPluginCallbacks* self, void* c_sqvm) {}
+void OnSqvmCreated(IPluginCallbacks* self, CSquirrelVM* c_sqvm)
+{
+  ns_logf(LOG_INFO, "created %s sqvm", get_context_name(c_sqvm->context));
 
-void OnSqvmDestroyed(IPluginCallbacks* self, int context) {}
+  sqapi(c_sqvm->context)->c_sq_define_constant(c_sqvm, "P4_TEST", 2);
+}
 
-void OnLibraryLoaded(IPluginCallbacks* self, HMODULE module, wchar_t* name) {}
+void OnSqvmDestroyed(IPluginCallbacks* self, CSquirrelVM* c_sqvm)
+{
+  ns_logf(LOG_INFO, "destroying %s sqvm", get_context_name(c_sqvm->context));
+}
+
+void OnLibraryLoaded(IPluginCallbacks* self, HMODULE module, const char* name)
+{
+  if(strcmp(name, "server.dll") == 0)
+  {
+    init_relay_sv(module);
+    return;
+  }
+
+  if(strcmp(name, "client.dll") == 0)
+  {
+    init_relay_cl(module);
+    return;
+  }
+}
 
 void RunFrame(IPluginCallbacks* self) {}
 
@@ -89,4 +134,3 @@ IPluginId g_pluginId = {
 };
 
 void* CreatePluginId() { return &g_pluginId; }
-
