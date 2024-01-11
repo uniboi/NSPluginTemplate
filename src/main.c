@@ -1,5 +1,6 @@
 #include <windows.h>
 #include "interfaces/interface.h"
+#include "bindings/native_closures.h"
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID reserved)
 {
@@ -11,6 +12,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID reserved)
     case DLL_PROCESS_DETACH:
       if(reserved) break; // don't cleanup if terminated
       interfaces_destroy(); // free all interfaces
+      deregister_native_closures(); // free all native squirrel closures
   }
   
   return TRUE;

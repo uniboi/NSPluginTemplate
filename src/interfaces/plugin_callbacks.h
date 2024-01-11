@@ -3,7 +3,7 @@
 
 #include <windows.h>
 #include <stdint.h>
-#include "interfaces/sys.h"
+#include <stdbool.h>
 #include "interface.h"
 #include "interfaces/ns_interface.h"
 #include "squirrel/squirrel.h"
@@ -45,7 +45,7 @@ typedef struct IPluginCallbacks {
   struct IPluginCallbacks_vftable{
    void (*Init)(struct IPluginCallbacks* self, HMODULE module, NorthstarData* data, char reloaded);
    void (*Finalize)(struct IPluginCallbacks* self);
-   void (*Unload)(struct IPluginCallbacks* self);
+   bool (*Unload)(struct IPluginCallbacks* self);
    void (*OnSqvmCreated)(struct IPluginCallbacks* self, CSquirrelVM* c_sqvm);
    void (*OnSqvmDestroyed)(struct IPluginCallbacks* self, CSquirrelVM* c_sqvm);
    void (*OnLibraryLoaded)(struct IPluginCallbacks* self, HMODULE module, const char* name);

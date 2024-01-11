@@ -16,3 +16,4 @@ const char* get_context_name(ScriptContext context)
       return "INVALID";
   }
 }
+

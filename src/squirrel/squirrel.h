@@ -78,4 +78,5 @@ static_assert(sizeof(CSquirrelVM) == 744, "CSquirrelVM is not sized correctly");
 
 const char* get_context_name(ScriptContext context);
 
+
 #endif

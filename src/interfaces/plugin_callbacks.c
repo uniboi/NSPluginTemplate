@@ -1,8 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "bindings/module.h"
 #include "plugin_callbacks.h"
+
+#include "interfaces/sys.h"
+#include "interfaces/engine_interface.h"
+#include "interfaces/cvar.h"
 #include "squirrel/relay.h"
+#include "cvar/cvar.h"
+#include "bindings/native_closures.h"
 
 #define PLUGIN_NAME "P4Plugin"
 #define PLUGIN_LOG_NAME PLUGIN_NAME
@@ -78,14 +85,31 @@ void Finalize(IPluginCallbacks* self)
   ns_log(LOG_INFO, "Finalized.");
 }
 
-void Unload(IPluginCallbacks* self)
+bool Unload(IPluginCallbacks* self)
 {
   ns_log(LOG_INFO, "Unloading.");
+  return true;
 }
 
 void OnSqvmCreated(IPluginCallbacks* self, CSquirrelVM* c_sqvm)
 {
   ns_logf(LOG_INFO, "created %s sqvm", get_context_name(c_sqvm->context));
+
+  switch(c_sqvm->context)
+  {
+    case SC_SERVER:
+      sv_register_native_closures(c_sqvm);
+      break;
+    case SC_CLIENT:
+      cl_register_native_closures(c_sqvm);
+      break;
+    case SC_UI:
+      ui_register_native_closures(c_sqvm);
+      break;
+    default:
+      ns_logf(LOG_INFO, "invalid context %d", c_sqvm->context);
+      return;
+  }
 
   sqapi(c_sqvm->context)->c_sq_define_constant(c_sqvm, "P4_TEST", 2);
 }
@@ -99,13 +123,23 @@ void OnLibraryLoaded(IPluginCallbacks* self, HMODULE module, const char* name)
 {
   if(strcmp(name, "server.dll") == 0)
   {
+    g_server = module;
     init_relay_sv(module);
     return;
   }
 
   if(strcmp(name, "client.dll") == 0)
   {
+    g_client = module;
     init_relay_cl(module);
+    return;
+  }
+
+  if(strcmp(name, "engine.dll") == 0)
+  {
+    g_engine = module;
+    init_engine_interface(module);
+    engine_cvar_init();
     return;
   }
 }
