@@ -1,6 +1,8 @@
 #include "native_closures.h"
 #include "bindings/module.h"
 #include "interfaces/sys.h"
+#include "squirrel/relay.h"
+
 #include <string.h>
 
 /*
@@ -8,8 +10,8 @@
  * clutter here
  */
 SQRESULT P4Test(HSquirrelVM *sqvm) {
-  ns_log(LOG_INFO, "Hello, Squirrel");
-  return SQRESULT_NULL;
+  g_sqsv.sq_pushstring(sqvm, "Hello World!", -1);
+  return SQRESULT_NOTNULL;
 }
 
 struct SQFunctionRegistrationList {
@@ -42,11 +44,11 @@ SQNativeClosureReturnType get_ret_ty(const char *ret_ty) {
   return SQ_RET_DEFAULT;
 }
 
-void bind_native_closure(void *module, struct SQFunctionRegistrationList *prev,
-                         CSquirrelVM *sqvm, const char *return_type,
-                         const char *name, const char *args_signature,
-                         const char *help_text,
-                         SQNativeClosureImplementation implementation) {
+void bind_native_closure(
+    void *module, struct SQFunctionRegistrationList *prev, CSquirrelVM *sqvm,
+    const char *return_type, const char *name, const char *args_signature,
+    const char *help_text, SQNativeClosureImplementation implementation
+) {
   RegisterSquirrelFunctionTy register_squirrel_function =
       ptr_at(module, 0x108E0);
 
@@ -79,32 +81,42 @@ void cl_register_native_closures(CSquirrelVM *sqvm) {}
 void ui_register_native_closures(CSquirrelVM *sqvm) {}
 
 void sv_register_native_closures(CSquirrelVM *sqvm) {
-  sv_bind_native_closure(sqvm, "void", "P4Test", "",
-                         "an example squirrel function provided by a plugin",
-                         P4Test);
+  sv_bind_native_closure(
+      sqvm, "string", "P4Test", "",
+      "an example squirrel function provided by a plugin", P4Test
+  );
 }
 
-void cl_bind_native_closure(CSquirrelVM *sqvm, const char *return_type,
-                            const char *name, const char *args_signature,
-                            const char *help_text,
-                            SQNativeClosureImplementation implementation) {
-  bind_native_closure(g_server, _sv_regs, sqvm, return_type, name,
-                      args_signature, help_text, implementation);
+void cl_bind_native_closure(
+    CSquirrelVM *sqvm, const char *return_type, const char *name,
+    const char *args_signature, const char *help_text,
+    SQNativeClosureImplementation implementation
+) {
+  bind_native_closure(
+      g_server, _sv_regs, sqvm, return_type, name, args_signature, help_text,
+      implementation
+  );
 }
 
-void ui_bind_native_closure(CSquirrelVM *sqvm, const char *return_type,
-                            const char *name, const char *args_signature,
-                            const char *help_text,
-                            SQNativeClosureImplementation implementation) {
-  bind_native_closure(g_client, _ui_regs, sqvm, return_type, name,
-                      args_signature, help_text, implementation);
+void ui_bind_native_closure(
+    CSquirrelVM *sqvm, const char *return_type, const char *name,
+    const char *args_signature, const char *help_text,
+    SQNativeClosureImplementation implementation
+) {
+  bind_native_closure(
+      g_client, _ui_regs, sqvm, return_type, name, args_signature, help_text,
+      implementation
+  );
 }
-void sv_bind_native_closure(CSquirrelVM *sqvm, const char *return_type,
-                            const char *name, const char *args_signature,
-                            const char *help_text,
-                            SQNativeClosureImplementation implementation) {
-  bind_native_closure(g_client, _cl_regs, sqvm, return_type, name,
-                      args_signature, help_text, implementation);
+void sv_bind_native_closure(
+    CSquirrelVM *sqvm, const char *return_type, const char *name,
+    const char *args_signature, const char *help_text,
+    SQNativeClosureImplementation implementation
+) {
+  bind_native_closure(
+      g_client, _cl_regs, sqvm, return_type, name, args_signature, help_text,
+      implementation
+  );
 }
 
 void _deregister_native_closures(struct SQFunctionRegistrationList *list) {
@@ -114,8 +126,10 @@ void _deregister_native_closures(struct SQFunctionRegistrationList *list) {
     c = c->next;
     free(l);
   }
+  list = 0;
 }
 
+// is this even required? vm might take care of it itself
 void deregister_native_closures() {
   _deregister_native_closures(_sv_regs);
   _deregister_native_closures(_ui_regs);

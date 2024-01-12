@@ -1,22 +1,18 @@
-#include <stdio.h>
 #include "interfaces/sys.h"
 #include "interfaces/ns_interface.h"
+#include <stdio.h>
 
-CSys* sys;
+CSys *sys;
 
-void sys_init()
-{
- sys = ns_create_interface(NS_SYS_VERSION, 0);
-}
+void sys_init() { sys = ns_create_interface(NS_SYS_VERSION, 0); }
 
-void ns_log(LogLevel level, const char* msg)
-{
-  if(!sys) return;
+void ns_log(LogLevel level, const char *msg) {
+  if (!sys)
+    return;
   sys->vftable->log(sys, g_ns_data.handle, level, msg);
 }
 
-void ns_logf(LogLevel level, const char* format, ...)
-{
+void ns_logf(LogLevel level, const char *format, ...) {
   char buf[128] = {0};
   va_list args;
   va_start(args, format);
@@ -27,7 +23,4 @@ void ns_logf(LogLevel level, const char* format, ...)
   ns_log(level, buf);
 }
 
-void ns_unload_self()
-{
-  sys->vftable->unload(sys, g_ns_data.handle);
-}
+void ns_unload_self() { sys->vftable->unload(sys, g_ns_data.handle); }

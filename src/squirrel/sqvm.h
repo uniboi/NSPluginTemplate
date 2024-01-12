@@ -4,7 +4,7 @@
 #include "squirrel/squirrel.h"
 
 typedef struct HSquirrelVM {
-  void* vftable;
+  void *vftable;
   int uiRef;
 
 } HSquirrelVM;

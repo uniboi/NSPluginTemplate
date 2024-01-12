@@ -7,6 +7,6 @@
 extern HMODULE g_engine_module;
 
 void init_engine_interface(HMODULE engine_module);
-void* engine_create_interface(char* name, InterfaceStatus* status);
+void *engine_create_interface(char *name, InterfaceStatus *status);
 
 #endif

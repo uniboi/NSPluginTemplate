@@ -1,27 +1,24 @@
 #include "relay.h"
 #include "interfaces/sys.h"
 
-#define PTR_AT(offset) ((void*)(base + offset))
+#define PTR_AT(offset) ((void *)(base + offset))
 
 SQRelay g_sqsv = {0};
 SQRelay g_sqcl = {0};
 
-SQRelay* sqapi(ScriptContext context)
-{
-  switch(context)
-  {
-    case SC_SERVER:
-      return &g_sqsv;
-    case SC_CLIENT:
-    case SC_UI:
-      return &g_sqcl;
-    default:
-      return 0;
+SQRelay *sqapi(ScriptContext context) {
+  switch (context) {
+  case SC_SERVER:
+    return &g_sqsv;
+  case SC_CLIENT:
+  case SC_UI:
+    return &g_sqcl;
+  default:
+    return 0;
   }
 }
 
-void init_relay_sv(HMODULE module)
-{
+void init_relay_sv(HMODULE module) {
   uintptr_t base = (uintptr_t)module;
 
   g_sqsv.sq_pushroottable = PTR_AT(0x5840);
@@ -65,8 +62,7 @@ void init_relay_sv(HMODULE module)
   g_sqsv.c_sq_define_constant = PTR_AT(0x1f550);
 }
 
-void init_relay_cl(HMODULE module)
-{
+void init_relay_cl(HMODULE module) {
   uintptr_t base = (uintptr_t)module;
 
   g_sqcl.sq_pushroottable = PTR_AT(0x5860);

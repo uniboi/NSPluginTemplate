@@ -1,8 +1,8 @@
 #ifndef SQUIRREL_H
 #define SQUIRREL_H
 
-#include <stdarg.h>
 #include <assert.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -48,7 +48,7 @@ typedef enum {
 } SQObjectType;
 
 typedef union {
-  void* userdata;
+  void *userdata;
 } SQObjectValue;
 
 typedef struct {
@@ -58,25 +58,27 @@ typedef struct {
 } SQObject;
 
 typedef struct HSquirrelVM HSquirrelVM;
-typedef HSquirrelVM* SQVM;
+typedef HSquirrelVM *SQVM;
 
 typedef struct {
-  void* vftable;
-  HSquirrelVM* sqvm;
+  void *vftable;
+  HSquirrelVM *sqvm;
   char gap_10[8];
   SQObject unkObj;
   int64_t unk;
   char gap_30[12];
   ScriptContext context;
   char gap_40[648];
-  char* (*formatString)(int64_t self, const char* format, ...);
+  char *(*formatString)(int64_t self, const char *format, ...);
   char gap_2D0[24];
 } CSquirrelVM;
 
-static_assert(offsetof(CSquirrelVM, context) == 0x3C, "vm context is not at the required offset");
+static_assert(
+    offsetof(CSquirrelVM, context) == 0x3C,
+    "vm context is not at the required offset"
+);
 static_assert(sizeof(CSquirrelVM) == 744, "CSquirrelVM is not sized correctly");
 
-const char* get_context_name(ScriptContext context);
-
+const char *get_context_name(ScriptContext context);
 
 #endif

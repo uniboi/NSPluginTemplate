@@ -37,21 +37,24 @@ typedef struct SQFunctionRegistration {
   SQNativeClosureImplementation implementation;
 } SQFunctionRegistration;
 
-typedef void *(*RegisterSquirrelFunctionTy)(CSquirrelVM *sqvm, void *fn,
-                                            char bUnknown);
+typedef void *(*RegisterSquirrelFunctionTy
+)(CSquirrelVM *sqvm, void *fn, char bUnknown);
 
-void cl_bind_native_closure(CSquirrelVM *, const char *return_type,
-                            const char *name, const char *args_signature,
-                            const char *help_text,
-                            SQNativeClosureImplementation implementation);
-void ui_bind_native_closure(CSquirrelVM *, const char *return_type,
-                            const char *name, const char *args_signature,
-                            const char *help_text,
-                            SQNativeClosureImplementation implementation);
-void sv_bind_native_closure(CSquirrelVM *, const char *return_type,
-                            const char *name, const char *args_signature,
-                            const char *help_text,
-                            SQNativeClosureImplementation implementation);
+void cl_bind_native_closure(
+    CSquirrelVM *, const char *return_type, const char *name,
+    const char *args_signature, const char *help_text,
+    SQNativeClosureImplementation implementation
+);
+void ui_bind_native_closure(
+    CSquirrelVM *, const char *return_type, const char *name,
+    const char *args_signature, const char *help_text,
+    SQNativeClosureImplementation implementation
+);
+void sv_bind_native_closure(
+    CSquirrelVM *, const char *return_type, const char *name,
+    const char *args_signature, const char *help_text,
+    SQNativeClosureImplementation implementation
+);
 
 void cl_register_native_closures(CSquirrelVM *);
 void ui_register_native_closures(CSquirrelVM *);

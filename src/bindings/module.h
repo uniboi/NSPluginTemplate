@@ -8,6 +8,8 @@ extern HMODULE g_server;
 extern HMODULE g_client;
 extern HMODULE g_engine;
 
-static inline void* ptr_at(void* mod, uint64_t offset) { return (void*)((uint64_t)mod + offset); };
+static inline void *ptr_at(void *mod, uint64_t offset) {
+  return (void *)((uint64_t)mod + offset);
+};
 
 #endif
