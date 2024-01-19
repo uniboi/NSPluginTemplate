@@ -12,7 +12,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID reserved) {
     if (reserved)
       break;                      // don't cleanup if terminated
     interfaces_destroy();         // free all interfaces
-    deregister_native_closures(); // free all native squirrel closures
   }
 
   return TRUE;

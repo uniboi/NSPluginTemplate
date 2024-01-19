@@ -6,6 +6,6 @@
 
 extern ICvar *g_pCVar;
 
-void engine_cvar_init();
+void engine_cvar_interface_init();
 
 #endif

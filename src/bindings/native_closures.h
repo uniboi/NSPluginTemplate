@@ -60,8 +60,8 @@ void cl_register_native_closures(CSquirrelVM *);
 void ui_register_native_closures(CSquirrelVM *);
 void sv_register_native_closures(CSquirrelVM *);
 
-// doesn't actually deregisters them, it just deallocates whatever was done for
-// the registration
-void deregister_native_closures();
+void cl_deregister_native_closures();
+void ui_deregister_native_closures();
+void sv_deregister_native_closures();
 
 #endif

@@ -109,6 +109,19 @@ void OnSqvmCreated(IPluginCallbacks *self, CSquirrelVM *c_sqvm) {
 
 void OnSqvmDestroyed(IPluginCallbacks *self, CSquirrelVM *c_sqvm) {
   ns_logf(LOG_INFO, "destroying %s sqvm", get_context_name(c_sqvm->context));
+
+  switch(c_sqvm->context)
+  {
+    case SC_SERVER:
+      sv_deregister_native_closures();
+      break;
+    case SC_CLIENT:
+      cl_deregister_native_closures();
+      break;
+    case SC_UI:
+      ui_deregister_native_closures();
+      break;
+  }
 }
 
 void OnLibraryLoaded(IPluginCallbacks *self, HMODULE module, const char *name) {
@@ -127,7 +140,7 @@ void OnLibraryLoaded(IPluginCallbacks *self, HMODULE module, const char *name) {
   if (strcmp(name, "engine.dll") == 0) {
     g_engine = module;
     init_engine_interface(module);
-    engine_cvar_init();
+    engine_cvar_interface_init();
     return;
   }
 }
