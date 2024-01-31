@@ -1,9 +1,11 @@
 #ifndef RELAY_H
 #define RELAY_H
 
+#include "bindings/native_closures.h"
 #include "squirrel/squirrel.h"
 #include <windows.h>
 
+// for functionality that exists both in server.dll and client.dll
 typedef struct {
   void (*sq_pushroottable)(SQVM sqvm);
   void (*sq_pushstring)(SQVM sqvm, const SQChar *str, SQInteger length);
@@ -50,6 +52,7 @@ typedef struct {
   SQInteger (*sq_raiseerror)(SQVM sqvm, const SQChar *err);
 
   void (*c_sq_define_constant)(CSquirrelVM *c_sqvm, const SQChar *name, int i);
+  RegisterSquirrelFunctionTy c_sq_register_function;
 } SQRelay;
 
 extern SQRelay g_sqsv;

@@ -1,1 +1,1 @@
-An example plugin to show what the new (unfinished) source-like ns plugin api looks like.
+A plugin that allows squirrel scripts to save recorded animations to files and replay them at any time.

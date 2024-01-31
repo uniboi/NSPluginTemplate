@@ -1,18 +1,10 @@
 #include "native_closures.h"
 #include "bindings/module.h"
+#include "bindings/relay.h"
 #include "interfaces/sys.h"
-#include "squirrel/relay.h"
 
+#include "anim/recorded_animation.h"
 #include <string.h>
-
-/*
- * you'll probably want put the implementation into a different file to avoid
- * clutter here
- */
-SQRESULT P4Test(HSquirrelVM* sqvm) {
-  g_sqsv.sq_pushstring(sqvm, "Hello World!", -1);
-  return SQRESULT_NOTNULL;
-}
 
 struct SQFunctionRegistrationList {
   SQFunctionRegistration reg;
@@ -22,6 +14,20 @@ struct SQFunctionRegistrationList {
 struct SQFunctionRegistrationList* _sv_regs = 0;
 struct SQFunctionRegistrationList* _cl_regs = 0;
 struct SQFunctionRegistrationList* _ui_regs = 0;
+
+void sv_register_native_closures(CSquirrelVM* sqvm) {
+  sv_bind_native_closure(
+      sqvm, "var", "CopyAnim", "var anim", "",
+      Script_CopyAnim
+  );
+
+  sv_bind_native_closure(sqvm, "void", "WriteTestAnim", "var anim", "", Script_WriteTestAnim);
+  sv_bind_native_closure(sqvm, "var", "ReadTestAnim", "", "", Script_ReadTestAnim);
+}
+
+void cl_register_native_closures(CSquirrelVM* sqvm) {}
+
+void ui_register_native_closures(CSquirrelVM* sqvm) {}
 
 SQNativeClosureReturnType get_ret_ty(const char* ret_ty) {
   if (strcmp(ret_ty, "bool"))
@@ -45,13 +51,10 @@ SQNativeClosureReturnType get_ret_ty(const char* ret_ty) {
 }
 
 void bind_native_closure(
-    void* module, struct SQFunctionRegistrationList* prev, CSquirrelVM* sqvm,
+    struct SQFunctionRegistrationList* prev, CSquirrelVM* sqvm,
     const char* return_type, const char* name, const char* args_signature,
     const char* help_text, SQNativeClosureImplementation implementation
 ) {
-  RegisterSquirrelFunctionTy register_squirrel_function =
-      ptr_at(module, 0x108E0);
-
   struct SQFunctionRegistrationList* fn_entry =
       malloc(sizeof(struct SQFunctionRegistrationList));
   fn_entry->next = prev;
@@ -73,27 +76,20 @@ void bind_native_closure(
   fn->unknown4 = 0;
   fn->implementation = implementation;
 
-  register_squirrel_function(sqvm, fn, 1);
+  sqapi(sqvm->context)
+      ->c_sq_register_function(
+          sqvm, fn, 0
+      ); // TODO northstar always sets 1, seems to be only for class members.
+         // Both work in the root table though for some reason.
 }
 
-void cl_register_native_closures(CSquirrelVM* sqvm) {}
-
-void ui_register_native_closures(CSquirrelVM* sqvm) {}
-
-void sv_register_native_closures(CSquirrelVM* sqvm) {
-  sv_bind_native_closure(
-      sqvm, "string", "P4Test", "",
-      "an example squirrel function provided by a plugin", P4Test
-  );
-}
-
-void cl_bind_native_closure(
+void sv_bind_native_closure(
     CSquirrelVM* sqvm, const char* return_type, const char* name,
     const char* args_signature, const char* help_text,
     SQNativeClosureImplementation implementation
 ) {
   bind_native_closure(
-      g_server, _sv_regs, sqvm, return_type, name, args_signature, help_text,
+      _sv_regs, sqvm, return_type, name, args_signature, help_text,
       implementation
   );
 }
@@ -104,17 +100,18 @@ void ui_bind_native_closure(
     SQNativeClosureImplementation implementation
 ) {
   bind_native_closure(
-      g_client, _ui_regs, sqvm, return_type, name, args_signature, help_text,
+      _ui_regs, sqvm, return_type, name, args_signature, help_text,
       implementation
   );
 }
-void sv_bind_native_closure(
+
+void cl_bind_native_closure(
     CSquirrelVM* sqvm, const char* return_type, const char* name,
     const char* args_signature, const char* help_text,
     SQNativeClosureImplementation implementation
 ) {
   bind_native_closure(
-      g_client, _cl_regs, sqvm, return_type, name, args_signature, help_text,
+      _cl_regs, sqvm, return_type, name, args_signature, help_text,
       implementation
   );
 }
@@ -133,3 +130,30 @@ void cl_deregister_native_closures() { _deregister_native_closures(_cl_regs); }
 void ui_deregister_native_closures() { _deregister_native_closures(_ui_regs); }
 void sv_deregister_native_closures() { _deregister_native_closures(_sv_regs); }
 
+void register_native_closures(CSquirrelVM* sqvm) {
+  switch (sqvm->context) {
+  case SC_SERVER:
+    sv_register_native_closures(sqvm);
+    break;
+  case SC_CLIENT:
+    cl_register_native_closures(sqvm);
+    break;
+  case SC_UI:
+    ui_register_native_closures(sqvm);
+    break;
+  }
+}
+
+void deregister_native_closures(ScriptContext context) {
+  switch (context) {
+  case SC_SERVER:
+    sv_deregister_native_closures();
+    break;
+  case SC_CLIENT:
+    cl_deregister_native_closures();
+    break;
+  case SC_UI:
+    ui_deregister_native_closures();
+    break;
+  }
+}

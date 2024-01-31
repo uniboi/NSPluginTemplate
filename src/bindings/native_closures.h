@@ -17,49 +17,51 @@ typedef enum SQNativeClosureReturnType {
   SQ_RET_TABLE = 0x26,
 } SQNativeClosureReturnType;
 
-typedef SQRESULT (*SQNativeClosureImplementation)(HSquirrelVM *sqvm);
+typedef SQRESULT (*SQNativeClosureImplementation)(HSquirrelVM* sqvm);
 
 typedef struct SQFunctionRegistration {
-  const char *sq_name;
-  const char *native_name;
-  const char *help_text;
-  const char *raw_ret_ty;     // squirrel type signature of the return type
-  const char *args_signature; // squirrel arguments signature
+  const char* sq_name;
+  const char* native_name;
+  const char* help_text;
+  const char* raw_ret_ty;     // squirrel type signature of the return type
+  const char* args_signature; // squirrel arguments signature
   uint32_t unknown1;
   uint32_t dev_level;
-  const char *short_name;
+  const char* short_name;
   uint32_t unknown2;
   SQNativeClosureReturnType return_type;
-  void *external_buffer;
+  void* external_buffer;
   uint64_t external_buffer_size;
   uint64_t unknown3;
   uint64_t unknown4;
   SQNativeClosureImplementation implementation;
 } SQFunctionRegistration;
 
-typedef void *(*RegisterSquirrelFunctionTy
-)(CSquirrelVM *sqvm, void *fn, char bUnknown);
+typedef void* (*RegisterSquirrelFunctionTy
+)(CSquirrelVM* sqvm, void* fn, char bUnknown);
 
 void cl_bind_native_closure(
-    CSquirrelVM *, const char *return_type, const char *name,
-    const char *args_signature, const char *help_text,
+    CSquirrelVM*, const char* return_type, const char* name,
+    const char* args_signature, const char* help_text,
     SQNativeClosureImplementation implementation
 );
 void ui_bind_native_closure(
-    CSquirrelVM *, const char *return_type, const char *name,
-    const char *args_signature, const char *help_text,
+    CSquirrelVM*, const char* return_type, const char* name,
+    const char* args_signature, const char* help_text,
     SQNativeClosureImplementation implementation
 );
 void sv_bind_native_closure(
-    CSquirrelVM *, const char *return_type, const char *name,
-    const char *args_signature, const char *help_text,
+    CSquirrelVM*, const char* return_type, const char* name,
+    const char* args_signature, const char* help_text,
     SQNativeClosureImplementation implementation
 );
 
-void cl_register_native_closures(CSquirrelVM *);
-void ui_register_native_closures(CSquirrelVM *);
-void sv_register_native_closures(CSquirrelVM *);
+void register_native_closures(CSquirrelVM*);
+void cl_register_native_closures(CSquirrelVM*);
+void ui_register_native_closures(CSquirrelVM*);
+void sv_register_native_closures(CSquirrelVM*);
 
+void deregister_native_closures(ScriptContext context);
 void cl_deregister_native_closures();
 void ui_deregister_native_closures();
 void sv_deregister_native_closures();
