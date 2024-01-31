@@ -1,7 +1,7 @@
 #include "squirrel.h"
 #include "interfaces/sys.h"
 
-const char *get_context_name(ScriptContext context) {
+const char* get_context_name(ScriptContext context) {
   switch (context) {
   case SC_SERVER:
     return "SERVER";

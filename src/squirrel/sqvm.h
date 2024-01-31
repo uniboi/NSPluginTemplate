@@ -3,8 +3,9 @@
 
 #include "squirrel/squirrel.h"
 
+// way too lazy to finish this struct ngl
 typedef struct HSquirrelVM {
-  void *vftable;
+  void* vftable;
   int uiRef;
 
 } HSquirrelVM;

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
-project(recorded_anim_persistance C)
+project(ExamplePlugin C)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_library(recanim SHARED
+add_library(example_plugin SHARED
   src/main.c
   src/interfaces/interface.h
   src/interfaces/interface.c
@@ -27,12 +27,11 @@ add_library(recanim SHARED
   src/bindings/module.c
   src/bindings/relay.h
   src/bindings/relay.c
-  src/anim/recorded_animation.h
-  src/anim/recorded_animation.c
+  src/bindings/assert.h
 )
 
-target_include_directories(recanim PRIVATE
+target_include_directories(example_plugin PRIVATE
   ${CMAKE_SOURCE_DIR}/src
 )
 
-SET_TARGET_PROPERTIES(recanim PROPERTIES PREFIX "") # remove the 'lib' prefix for dlls
+SET_TARGET_PROPERTIES(example_plugin PROPERTIES PREFIX "") # remove the 'lib' prefix for dlls

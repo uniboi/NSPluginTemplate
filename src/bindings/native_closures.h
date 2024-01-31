@@ -3,7 +3,6 @@
 
 #include "squirrel/squirrel.h"
 
-// TODO might be inclomplete idk
 typedef enum SQNativeClosureReturnType {
   SQ_RET_FLOAT = 0x1,
   SQ_RET_VEC = 0x3,
@@ -37,22 +36,18 @@ typedef struct SQFunctionRegistration {
   SQNativeClosureImplementation implementation;
 } SQFunctionRegistration;
 
-typedef void* (*RegisterSquirrelFunctionTy
-)(CSquirrelVM* sqvm, void* fn, char bUnknown);
+typedef void* (*RegisterSquirrelFunctionTy)(CSquirrelVM* sqvm, void* fn, char bUnknown);
 
 void cl_bind_native_closure(
-    CSquirrelVM*, const char* return_type, const char* name,
-    const char* args_signature, const char* help_text,
+    CSquirrelVM*, const char* return_type, const char* name, const char* args_signature, const char* help_text,
     SQNativeClosureImplementation implementation
 );
 void ui_bind_native_closure(
-    CSquirrelVM*, const char* return_type, const char* name,
-    const char* args_signature, const char* help_text,
+    CSquirrelVM*, const char* return_type, const char* name, const char* args_signature, const char* help_text,
     SQNativeClosureImplementation implementation
 );
 void sv_bind_native_closure(
-    CSquirrelVM*, const char* return_type, const char* name,
-    const char* args_signature, const char* help_text,
+    CSquirrelVM*, const char* return_type, const char* name, const char* args_signature, const char* help_text,
     SQNativeClosureImplementation implementation
 );
 

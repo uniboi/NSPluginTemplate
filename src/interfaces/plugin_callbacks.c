@@ -1,19 +1,15 @@
 #include "plugin_callbacks.h"
-#include "anim/recorded_animation.h"
 #include "bindings/module.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "bindings/native_closures.h"
+#include "bindings/relay.h"
 #include "cvar/cvar.h"
 #include "interfaces/cvar.h"
 #include "interfaces/engine_interface.h"
 #include "interfaces/sys.h"
-#include "bindings/relay.h"
 
-#define PLUGIN_NAME "RecAnTest"
-#define PLUGIN_LOG_NAME PLUGIN_NAME
+#define PLUGIN_NAME " EXAMPLE "
+#define PLUGIN_LOG_NAME                                                                                                \
+  PLUGIN_NAME // all northstar log tags use 9 characters. Keep the same length to make your logs look a bit nicer
 #define PLUGIN_DEPENDENCY_NAME PLUGIN_NAME
 #define PLUGIN_CONTEXT (PCTX_DEDICATED | PCTX_CLIENT)
 
@@ -21,7 +17,6 @@ void sv_initialize(HMODULE sv) {
   ns_log(LOG_INFO, "initializing server bridge");
   g_server = sv;
   init_relay_sv(sv);
-  init_recorded_animation(sv);
 }
 
 void cl_initialize(HMODULE cl) {
@@ -37,6 +32,7 @@ void en_initialize(HMODULE en) {
   engine_cvar_interface_init();
 }
 
+// After the plugin has been reloaded, make sure to redefine everything necessary
 void reinitialize() {
   HMODULE sv_module = GetModuleHandleA("server.dll");
   if (sv_module)
@@ -76,9 +72,7 @@ int64_t GetField(IPluginId* self, PluginField prop) {
   }
 }
 
-void Init(
-    IPluginCallbacks* self, HMODULE module, NorthstarData* data, char reloaded
-) {
+void Init(IPluginCallbacks* self, HMODULE module, NorthstarData* data, char reloaded) {
   init_ns_interface(module, data);
   sys_init();
 
@@ -108,6 +102,20 @@ void Finalize(IPluginCallbacks* self) {
 
 bool Unload(IPluginCallbacks* self) {
   ns_log(LOG_INFO, "Unloading.");
+
+  /*
+   * If this returns `false`, the plugin *will not be unloaded*.
+   * It might be a good idea to never unload the plugin in builts meant to be distributed to increase stability since
+   * plugins are (as of right now) only meant to be reloaded / unloaded at runtime for development purposes.
+   * (This might change)
+   *
+   * #if DEV
+   * return true;
+   * #else
+   * return false;
+   * #endif
+   */
+
   return true;
 }
 
@@ -158,8 +166,6 @@ IPluginCallbacks g_pluginCallbacks = {
 
 void* CreatePluginCallbacks() { return &g_pluginCallbacks; }
 
-IPluginId g_pluginId = {
-    .vftable = &(struct IPluginId_vftable
-    ){.GetString = GetString, .GetField = GetField}};
+IPluginId g_pluginId = {.vftable = &(struct IPluginId_vftable){.GetString = GetString, .GetField = GetField}};
 
 void* CreatePluginId() { return &g_pluginId; }
